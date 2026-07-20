@@ -1,1 +1,1 @@
-Sorry, the file is too large.
+Sorry, too large.
