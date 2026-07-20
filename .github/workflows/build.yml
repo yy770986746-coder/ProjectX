@@ -1,0 +1,50 @@
+name: Build ProjectX
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install Theos
+        run: |
+          bash -c "$(curl -fsSL https://raw.githubusercontent.com/theos/theos/master/bin/install-theos)"
+          echo "THEOS=~/theos" >> $GITHUB_ENV
+
+      - name: Install ldid
+        run: |
+          brew install ldid
+
+      - name: Install Packaging Tools
+        run: |
+          brew install dpkg fakeroot
+
+      - name: Download iOS SDK
+        run: |
+          mkdir -p ~/theos/sdks
+          curl -L -o /tmp/iPhoneOS16.5.sdk.zip https://github.com/xybp888/iOS-SDKs/releases/download/16.5/iPhoneOS16.5.sdk.zip
+          unzip -q -o /tmp/iPhoneOS16.5.sdk.zip -d ~/theos/sdks/
+
+      - name: Build
+        env:
+          THEOS: /Users/runner/theos
+        run: |
+          cd $GITHUB_WORKSPACE
+          make clean
+          make package
+
+      - name: Upload .deb
+        uses: actions/upload-artifact@v4
+        with:
+          name: ProjectX-deb
+          path: packages/*.deb
