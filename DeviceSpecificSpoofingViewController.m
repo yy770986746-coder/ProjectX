@@ -1,1 +1,1 @@
-// Placeholder - will be replaced with translated version
+Sorry, the file is too large.
